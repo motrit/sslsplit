@@ -120,6 +120,9 @@ opts_free(opts_t *opts)
 	if (opts->leafcertdir) {
 		free(opts->leafcertdir);
 	}
+	if (opts->spoof_number) {
+		free(opts->spoof_number);
+	}
 	if (opts->defaultleafcert) {
 		cert_free(opts->defaultleafcert);
 	}
@@ -999,6 +1002,17 @@ opts_set_group(opts_t *opts, const char *argv0, const char *optarg)
 		oom_die(argv0);
 #ifdef DEBUG_OPTS
 	log_dbg_printf("Group: %s\n", opts->dropgroup);
+#endif /* DEBUG_OPTS */
+}
+
+void
+opts_set_spoof(opts_t *opts, const char *argv0, const char *optarg)
+{
+	if (opts->spoof_number)
+		free(opts->spoof_number);
+	opts->spoof_number = atoi(optarg);
+#ifdef DEBUG_OPTS
+	log_dbg_printf("Spoof number: %d\n", opts->spoof_number);
 #endif /* DEBUG_OPTS */
 }
 

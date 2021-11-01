@@ -151,6 +151,8 @@ main_usage(void)
 "  -k pemfile  use CA key (and cert) from pemfile to sign forged certs\n"
 "  -C pemfile  use CA chain from pemfile (intermediate and root CA certs)\n"
 "  -K pemfile  use key from pemfile for leaf certs (default: generate)\n"
+"  -n number   specify SSL-connection attempt number to be spoofed, 99999 value\n"
+"			   can be used to spoof requests randomly\n"
 "  -q crlurl   use URL as CRL distribution point for all forged certs\n"
 "  -t certdir  use cert+chain+key PEM files from certdir to target all sites\n"
 "              matching the common names (non-matching: -T or generate if CA)\n"
@@ -331,7 +333,7 @@ main(int argc, char *argv[])
 
 	while ((ch = getopt(argc, argv,
 	                    OPT_g OPT_G OPT_Z OPT_i OPT_x OPT_T OPT_I
-	                    "k:c:C:K:t:A:OPa:b:s:r:R:e:Eu:m:j:p:l:L:S:F:M:"
+	                    "k:c:C:K:t:A:OPa:b:s:r:R:e:Eu:m:n:j:p:l:L:S:F:M:"
 	                    "dDVhW:w:q:f:o:X:Y:y:")) != -1) {
 		switch (ch) {
 			case 'f':
@@ -430,6 +432,9 @@ main(int argc, char *argv[])
 				break;
 			case 'm':
 				opts_set_group(opts, argv0, optarg);
+				break;
+			case 'n':
+				opts_set_spoof(opts, argv0, optarg);
 				break;
 			case 'p':
 				opts_set_pidfile(opts, argv0, optarg);

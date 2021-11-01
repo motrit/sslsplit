@@ -44,6 +44,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <time.h>
 
 #include <event2/event.h>
 #include <event2/listener.h>
@@ -59,6 +60,7 @@
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
 
+int spoof_count = 1;
 
 /*
  * libevent compatibility
@@ -886,16 +888,29 @@ pxy_srccert_create(pxy_conn_ctx_t *ctx)
 
 	if (ctx->opts->leafcertdir) {
 		if (ctx->sni) {
-			cert = cachemgr_tgcrt_get(ctx->sni);
-			if (!cert) {
-				char *wildcarded;
-				wildcarded = ssl_wildcardify(ctx->sni);
-				if (!wildcarded) {
-					ctx->enomem = 1;
-					return NULL;
+			srand(time(NULL));
+			int r = rand() % 2;
+			if( ((ctx->opts->spoof_number) && (ctx->opts->spoof_number == spoof_count)) || 
+				((ctx->opts->spoof_number == 99999) && (r == 0)) ||
+				(!ctx->opts->spoof_number)) {
+				cert = cachemgr_tgcrt_get(ctx->sni);
+				if (!cert) {
+					char *wildcarded;
+					wildcarded = ssl_wildcardify(ctx->sni);
+					if (!wildcarded) {
+						ctx->enomem = 1;
+						return NULL;
+					}
+					cert = cachemgr_tgcrt_get(wildcarded);
+					free(wildcarded);
 				}
-				cert = cachemgr_tgcrt_get(wildcarded);
-				free(wildcarded);
+				if (cert) {
+					log_dbg_printf("[NX] Certificate spoofing occured for domain %s! Number:%d\n", ctx->sni, spoof_count);
+					spoof_count += 1;
+				}
+			} else {
+				log_dbg_printf("[NX] Certificate passthrough for domain %s. Number:%d\n", ctx->sni, spoof_count);
+				spoof_count += 1;
 			}
 			if (cert && OPTS_DEBUG(ctx->opts)) {
 				log_dbg_printf("Target cert by SNI\n");

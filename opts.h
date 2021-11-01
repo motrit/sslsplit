@@ -108,6 +108,7 @@ typedef struct opts {
 	CONST_SSL_METHOD *(*sslmethod)(void);
 #if (OPENSSL_VERSION_NUMBER >= 0x10100000L) && !defined(LIBRESSL_VERSION_NUMBER)
 	int sslversion;
+	int spoof_number;
 #endif /* OPENSSL_VERSION_NUMBER >= 0x10100000L */
 	X509 *cacrt;
 	EVP_PKEY *cakey;
@@ -171,6 +172,7 @@ void opts_set_openssl_engine(opts_t *, const char *, const char *)
      NONNULL(1,2,3);
 void opts_set_user(opts_t *, const char *, const char *) NONNULL(1,2,3);
 void opts_set_group(opts_t *, const char *, const char *) NONNULL(1,2,3);
+void opts_set_spoof(opts_t *, const char *, const char *) NONNULL(1,2,3);
 void opts_set_jaildir(opts_t *, const char *, const char *) NONNULL(1,2,3);
 void opts_set_pidfile(opts_t *, const char *, const char *) NONNULL(1,2,3);
 void opts_set_connectlog(opts_t *, const char *, const char *) NONNULL(1,2,3);
